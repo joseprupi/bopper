@@ -1,0 +1,65 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-2.5.xsd">
+
+    <context:component-scan base-package="com.backofficer"/>
+    <mvc:annotation-driven />
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/backofficer" />
+        <property name="username" value="root" />
+        <property name="password" value="mysqlroot" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="payment" class="com.backofficer.payment.impl.PaymentMysqlDAO"/>
+
+    <bean id="qt" class="com.backofficer.Query.QueryTask"></bean>
+
+
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://embedded?broker.persistent=false"/>
+        <property name="redeliveryPolicy">
+            <bean class="org.apache.activemq.RedeliveryPolicy">
+                <property name="maximumRedeliveries" value="4"/>
+            </bean>
+        </property>
+    </bean>
+
+   <bean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+       <property name="targetConnectionFactory" ref="connectionFactory"/>
+   </bean>
+
+   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+       <property name="connectionFactory" ref="cachingConnectionFactory"/>
+       <property name="defaultDestination" ref="incomingQueue"/>
+   </bean>
+
+   <bean id="incomingQueue" class="org.apache.activemq.command.ActiveMQQueue">
+       <constructor-arg value="incoming.queue"/>
+   </bean>
+
+    <!--
+   <jms:listener-container connection-factory="connectionFactory" acknowledge="transacted">
+       <jms:listener ref="MQReader" destination="incoming.queue"/>
+   </jms:listener-container>
+   -->
+</beans>
