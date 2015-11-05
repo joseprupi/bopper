@@ -71,6 +71,9 @@ public class PaymentMysqlDAO implements PaymentDAO {
 
     public void updatePayment(Payment student){
 
+        String sql = "insert into payments(data, approved) values  (?, ?)";
+        jdbcTemplate.update(sql, new Object[] { 1000,0});
+
     }
 
     public void deletePayment(Payment student){

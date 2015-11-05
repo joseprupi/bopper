@@ -36,7 +36,7 @@
 
 
     <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="vm://embedded?broker.persistent=false"/>
+        <property name="brokerURL" value="tcp://localhost:61616"/>
         <property name="redeliveryPolicy">
             <bean class="org.apache.activemq.RedeliveryPolicy">
                 <property name="maximumRedeliveries" value="4"/>
@@ -44,22 +44,27 @@
         </property>
     </bean>
 
-   <bean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-       <property name="targetConnectionFactory" ref="connectionFactory"/>
-   </bean>
+    <bean id="cachingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="connectionFactory"/>
+    </bean>
 
-   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-       <property name="connectionFactory" ref="cachingConnectionFactory"/>
-       <property name="defaultDestination" ref="incomingQueue"/>
-   </bean>
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="cachingConnectionFactory"/>
+        <property name="defaultDestination" ref="incomingQueue"/>
+    </bean>
 
-   <bean id="incomingQueue" class="org.apache.activemq.command.ActiveMQQueue">
-       <constructor-arg value="incoming.queue"/>
-   </bean>
+    <bean id="incomingQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="incoming.queue"/>
+    </bean>
 
-    <!--
-   <jms:listener-container connection-factory="connectionFactory" acknowledge="transacted">
-       <jms:listener ref="MQReader" destination="incoming.queue"/>
-   </jms:listener-container>
-   -->
+    <bean id="simpleMessageListener" class="com.backofficer.Queue.MQReader"/>
+
+    <jms:listener-container
+            container-type="default"
+            connection-factory="connectionFactory"
+            acknowledge="auto"
+            concurrency="10-50">
+        <jms:listener destination="test" ref="simpleMessageListener" method="onMessage" />
+    </jms:listener-container>
+
 </beans>

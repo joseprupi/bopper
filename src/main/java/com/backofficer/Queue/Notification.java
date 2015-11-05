@@ -5,11 +5,11 @@ import java.io.Serializable;
 public class Notification implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private int id;
+    private String id;
     private String message;
 
 
-    public Notification(int id, String message) {
+    public Notification(String id, String message) {
         this.id = id;
         this.message = message;
     }
@@ -17,13 +17,13 @@ public class Notification implements Serializable {
     /**
      * @return the id
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
     /**

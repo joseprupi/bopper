@@ -11,10 +11,7 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.ObjectMessage;
+import javax.jms.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,38 +27,13 @@ public class MQReader implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
-            Notification notification = (Notification) ((ObjectMessage) message).getObject();
-            logger.info("Received notification | Id: "+notification.getId()+" | Redelivery: "+getDeliveryNumber(message));
 
-            checkPreprocessException(notification);
+            TextMessage tm = (TextMessage) message;
+            Notification notification = new Notification(tm.getJMSMessageID(),tm.getText());
             saveToBD(notification);
-            checkPostprocessException(message, notification);
+
         } catch (JMSException e) {
             throw JmsUtils.convertJmsAccessException(e);
-        }
-    }
-
-    /**
-     * Execution failure after receiving the message and before saving it to the DB
-     *
-     * @param notification
-     */
-    private void checkPreprocessException(Notification notification) {
-        if (notification.getId() == 1) {
-            throw new RuntimeException("error after receiving message");
-        }
-    }
-
-    /**
-     * Execution failure after saving the message to the DB
-     *
-     * @param message
-     * @param notification
-     * @throws JMSException
-     */
-    private void checkPostprocessException(Message message, Notification notification) throws JMSException {
-        if (notification.getId() == 2 && getDeliveryNumber(message) < 2) {
-            throw new RuntimeException("error after processing message");
         }
     }
 
@@ -78,9 +50,9 @@ public class MQReader implements MessageListener {
 
     @Transactional
     private void saveToBD(Notification notification) {
-        String query = "insert into NOTIFICATIONS(id, message) values (?,?)";
+
         Payment payment2 = new Payment();
         payment.updatePayment(payment2);
-        //jdbcTemplate.update(query, notification.getId(), notification.getMessage());
+
     }
 }
