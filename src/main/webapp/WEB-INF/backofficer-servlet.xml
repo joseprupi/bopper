@@ -30,7 +30,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="payment" class="com.backofficer.payment.impl.PaymentMysqlDAO"/>
+    <bean id="message" class="com.backofficer.message.impl.MessageMysqlDAO"/>
 
     <bean id="qt" class="com.backofficer.Query.QueryTask"></bean>
 

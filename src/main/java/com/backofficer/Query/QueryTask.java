@@ -1,5 +1,7 @@
 package com.backofficer.Query;
 
+import com.backofficer.message.Message;
+import com.backofficer.message.MessageDAO;
 import com.backofficer.payment.Payment;
 import com.backofficer.payment.PaymentDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +19,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public class QueryTask {
 
     @Autowired
-    private PaymentDAO payment;
-    List<Payment> oldPaymentList;
+    private MessageDAO message;
+    List<Message> oldMessageList;
     private ApplicationContext context;
 
     private Thread t;
     private AtomicLong counter = new AtomicLong();
-    private List<DeferredResult<List<Payment>>> subscribedClient = Collections.synchronizedList(new ArrayList<DeferredResult<List<Payment>>>());
+    private List<DeferredResult<List<Message>>> subscribedClient = Collections.synchronizedList(new ArrayList<DeferredResult<List<Message>>>());
 
     public void run() {
 
-        oldPaymentList = new ArrayList<Payment>(payment.getAllPayments());
+        oldMessageList = new ArrayList<Message>(message.getAllMessages());
 
         t = new Thread(
                 new Runnable() {
@@ -44,16 +46,16 @@ public class QueryTask {
                                 //log.error(e);
                             }
 
-                            List<Payment> paymentList = payment.getAllPayments();
+                            List<Message> messageList = message.getAllMessages();
 
-                            if(paymentList != null){
-                                if(cmp(paymentList,oldPaymentList)==false){
-                                    oldPaymentList = new ArrayList<Payment>(paymentList);
+                            if(messageList != null){
+                                if(cmp(messageList,oldMessageList)==false){
+                                    oldMessageList = new ArrayList<Message>(messageList);
                                     synchronized(subscribedClient) {
-                                        Iterator<DeferredResult<List<Payment>>> it = subscribedClient.iterator();
+                                        Iterator<DeferredResult<List<Message>>> it = subscribedClient.iterator();
                                         while(it.hasNext()) {
-                                            DeferredResult<List<Payment>> dr = it.next();
-                                            dr.setResult(paymentList);
+                                            DeferredResult<List<Message>> dr = it.next();
+                                            dr.setResult(messageList);
                                             it.remove();
                                         }
                                     }
@@ -68,7 +70,7 @@ public class QueryTask {
     }
 
 
-    public void addSubscribed(DeferredResult<List<Payment>> client) {
+    public void addSubscribed(DeferredResult<List<Message>> client) {
         synchronized(subscribedClient) {
             subscribedClient.add(client);
         }

@@ -1,11 +1,9 @@
 package com.backofficer.controller;
 
 import com.backofficer.Query.QueryTask;
-import com.backofficer.payment.Payment;
+import com.backofficer.message.Message;
+import com.backofficer.message.MessageDAO;
 
-
-import com.backofficer.payment.PaymentDAO;
-import com.backofficer.payment.impl.PaymentMysqlDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +22,7 @@ public class BackofficerController{
     private ApplicationContext context;
 
     @Autowired
-    private PaymentDAO payment;
+    private MessageDAO message;
     @Autowired
     private QueryTask qt;
 
@@ -44,14 +42,14 @@ public class BackofficerController{
 
     @RequestMapping(value = "/getlist")
     public @ResponseBody
-    List<Payment> getList() {
-        return payment.getAllPayments();
+    List<Message> getList() {
+        return message.getAllMessages();
     }
 
     @RequestMapping(value="/updatelist")
     @ResponseBody
-    public DeferredResult<List<Payment>> ajaxReply() throws Exception {
-        final DeferredResult<List<Payment>> dr = new DeferredResult<List<Payment>>(
+    public DeferredResult<List<Message>> ajaxReply() throws Exception {
+        final DeferredResult<List<Message>> dr = new DeferredResult<List<Message>>(
                 30000);
         qt.addSubscribed(dr);
 

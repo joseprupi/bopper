@@ -4,6 +4,6 @@
 	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <import resource="spring-datasource.xml" />
-    <import resource="spring-payment.xml" />
+    <import resource="spring-message.xml" />
 
 </beans>

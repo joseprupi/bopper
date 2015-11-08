@@ -1,8 +1,6 @@
 package com.backofficer.Queue;
 
-import com.backofficer.payment.Payment;
-import com.backofficer.payment.PaymentDAO;
-import com.backofficer.payment.impl.PaymentMysqlDAO;
+import com.backofficer.message.MessageDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jms.annotation.JmsListener;
@@ -22,7 +20,7 @@ public class MQReader implements MessageListener {
     private static Logger logger = LoggerFactory.getLogger(MQReader.class);
 
     @Autowired
-    private PaymentDAO payment;
+    private MessageDAO message;
 
     @Override
     public void onMessage(Message message) {
@@ -51,8 +49,7 @@ public class MQReader implements MessageListener {
     @Transactional
     private void saveToBD(Notification notification) {
 
-        Payment payment2 = new Payment();
-        payment.updatePayment(payment2);
+        message.updateMessage();
 
     }
 }
